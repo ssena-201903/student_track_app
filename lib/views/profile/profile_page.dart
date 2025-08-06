@@ -1,5 +1,6 @@
 // profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:student_track/constants/constants.dart';
 import 'package:student_track/widgets/custom_text.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -13,11 +14,16 @@ class ProfilePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            CustomText(text: "Profilim", color: Colors.indigo, fontWeight: FontWeight.bold, fontSize: 20),
+            CustomText(
+              text: "Profilim",
+              color: Constants.primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
             const SizedBox(height: 20),
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.indigo,
+              backgroundColor: Constants.primaryColor,
               child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 16),

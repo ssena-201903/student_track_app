@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:student_track/constants/constants.dart';
+import 'package:student_track/views/login/login_page.dart';
 import 'package:student_track/views/main_shell.dart';
 
 void main() {
@@ -14,10 +16,24 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Constants.primaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
+          ),
+        ),
         textTheme: GoogleFonts.poppinsTextTheme(),
-        primarySwatch: Colors.indigo,
+        cardTheme: CardThemeData(color: Constants.primaryWhiteTone),
       ),
-      home: MainShell(),
+
+      home: LoginPage(),
     );
   }
 }

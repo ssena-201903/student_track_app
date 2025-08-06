@@ -4,19 +4,17 @@ class DataHelper {
 
   static List<Map<String, String>> getTopCardsData() {
     return [
-      {'title': '85%', 'subtitle': 'Hedef Tamamlama'},
+      {'title': '85%', 'subtitle': 'Hedeflerim'},
       {'title': '127', 'subtitle': 'Haftalık Soru'},
-      {'title': '4', 'subtitle': 'Yeni Hedef'},
-      {'title': '12', 'subtitle': 'Pomodoro'},
+      {'title': '0', 'subtitle': 'Yeni Hedef'},
+      {'title': '6/12', 'subtitle': 'Saat Çalışma'},
     ];
   }
 
   static List<Map<String, String>> getBottomCardsData() {
     return [
       {'title': 'Pomodoro Başlat'},
-      {'title': 'Hedefleri Gör'},
-      {'title': 'Soru Ekle'},
-      {'title': 'Denemelerim'},
+      {'title': 'Denemeler'},
     ];
   }
 

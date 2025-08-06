@@ -1,5 +1,6 @@
 // home_page.dart
 import 'package:flutter/material.dart';
+import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
@@ -27,12 +28,12 @@ class HomePage extends StatelessWidget {
               Row(
                 children: [
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
                           text: "Merhaba ",
                           style: TextStyle(
-                            color: Colors.indigo,
+                            color: Constants.primaryColor,
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
                           ),
@@ -40,7 +41,7 @@ class HomePage extends StatelessWidget {
                         TextSpan(
                           text: "Safiye",
                           style: TextStyle(
-                            color: Colors.indigo,
+                            color: Constants.primaryColor,
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
                           ),
@@ -49,7 +50,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Icon(Icons.waving_hand, color: Colors.indigo),
+                  Icon(Icons.waving_hand, color: Constants.primaryColor),
                 ],
               ),
               const CustomText(
@@ -63,7 +64,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.indigo,
+        foregroundColor: Constants.primaryColor,
         elevation: 0,
       ),
       backgroundColor: Colors.white,
@@ -78,6 +79,18 @@ class HomePage extends StatelessWidget {
             _buildBottomCards(lastCards),
             const SizedBox(height: 20),
           ],
+        ),
+      ),
+
+      // floating button
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        icon: Icon(Icons.add),
+        label: CustomText(
+          text: "Günlük Soru",
+          color: Colors.white,
+          fontWeight: FontWeight.normal,
+          fontSize: 16,
         ),
       ),
     );
@@ -113,7 +126,7 @@ class HomePage extends StatelessWidget {
           children: [
             CustomText(
               text: "${sentence[0]["text"]}",
-              color: Colors.indigo,
+              color: Constants.primaryColor,
               fontWeight: FontWeight.w400,
               fontSize: 16,
               textAlign: TextAlign.center,
@@ -175,10 +188,21 @@ class TopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 3. elemanın title değeri int'e çevrilmiş hali
+    int? thirdTitleAsInt;
+
+    if (index == 2) {
+      // title string'i int'e çevrilmeye çalışılır (hatalıysa null döner)
+      thirdTitleAsInt = int.tryParse(title);
+    }
+
+    final bool shouldHighlight = index == 2 && (thirdTitleAsInt ?? 0) > 0;
+
     return SizedBox(
       width: (MediaQuery.of(context).size.width - 48) / 2,
       height: 120,
       child: Card(
+        color: shouldHighlight ? Constants.primaryColor : null,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 4,
         child: Padding(
@@ -189,20 +213,30 @@ class TopCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(_getIconForIndex(index), color: Colors.indigo, size: 24),
+                  Icon(
+                    _getIconForIndex(index),
+                    color: shouldHighlight
+                        ? Colors.white
+                        : Constants.primaryColor,
+                    size: 24,
+                  ),
                   const SizedBox(width: 8),
                   CustomText(
                     text: title,
-                    color: Colors.indigo,
+                    color: shouldHighlight
+                        ? Colors.white
+                        : Constants.primaryColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                    fontSize: shouldHighlight ? 24 : 22,
                   ),
                 ],
               ),
               const SizedBox(height: 6),
               CustomText(
-                text: subTitle,
-                color: Colors.black45,
+                text: index == 2
+                    ? (shouldHighlight ? subTitle : "Yeni hedef yok")
+                    : subTitle,
+                color: shouldHighlight ? Colors.white : Colors.black45,
                 fontWeight: FontWeight.w400,
                 fontSize: 14,
               ),
@@ -225,11 +259,7 @@ class BottomCard extends StatelessWidget {
       case 0:
         return Icons.access_time;
       case 1:
-        return Icons.track_changes;
-      case 2:
-        return Icons.edit;
-      case 3:
-        return Icons.fact_check_outlined;
+        return Icons.description;
       default:
         return Icons.info_outline;
     }
@@ -247,7 +277,11 @@ class BottomCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(_getIconForIndex(index), color: Colors.indigo, size: 24),
+              Icon(
+                _getIconForIndex(index),
+                color: Constants.primaryColor,
+                size: 24,
+              ),
               const SizedBox(width: 8),
               CustomText(
                 text: title,

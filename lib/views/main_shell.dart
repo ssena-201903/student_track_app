@@ -1,9 +1,9 @@
 // main_shell.dart
 import 'package:flutter/material.dart';
+import 'package:student_track/constants/constants.dart';
 import 'package:student_track/views/analysis/analysis_page.dart';
 import 'package:student_track/views/home/home_page.dart';
 import 'package:student_track/views/profile/profile_page.dart';
-import 'package:student_track/widgets/custom_drawer.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -27,14 +27,18 @@ class _MainShellState extends State<MainShell> {
       backgroundColor: Colors.white,
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Constants.primaryWhiteTone,
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.black38,
         onTap: (index) => setState(() => _selectedIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Ana Sayfa"),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: "İstatistik"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil"),
+          BottomNavigationBarItem(icon: Icon(Icons.push_pin), label: "Konular"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: "Görevler",
+          ),
         ],
       ),
     );
