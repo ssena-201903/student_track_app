@@ -1,6 +1,8 @@
+// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:student_track/helpers/data_helper.dart';
 import 'package:student_track/widgets/custom_text.dart';
+import 'package:student_track/widgets/custom_drawer.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -13,62 +15,71 @@ class HomePage extends StatelessWidget {
 
     double deviceWidth = MediaQuery.of(context).size.width;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          _buildAppBarTitle(),
-          _buildTopCards(firstCards),
-          _buildTodaySentence(todaySentence, deviceWidth),
-          _buildBottomCards(lastCards),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  Column _buildAppBarTitle() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            RichText(
-              text: const TextSpan(
+    return Scaffold(
+      drawer: const CustomDrawer(),
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
                 children: [
-                  TextSpan(
-                    text: "Merhaba ",
-                    style: TextStyle(
-                      color: Colors.indigo,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
+                  RichText(
+                    text: const TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Merhaba ",
+                          style: TextStyle(
+                            color: Colors.indigo,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "Safiye",
+                          style: TextStyle(
+                            color: Colors.indigo,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  TextSpan(
-                    text: "Safiye",
-                    style: TextStyle(
-                      color: Colors.indigo,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.waving_hand, color: Colors.indigo),
                 ],
               ),
-            ),
-            const SizedBox(width: 10),
-            const Icon(Icons.waving_hand, color: Colors.indigo),
+              const CustomText(
+                text: "Bugün harika bir gün olacak!",
+                color: Colors.black38,
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.indigo,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            _buildTopCards(firstCards),
+            _buildTodaySentence(todaySentence, deviceWidth),
+            _buildBottomCards(lastCards),
+            const SizedBox(height: 20),
           ],
         ),
-        const CustomText(
-          text: "Bugün harika bir gün olacak!",
-          color: Colors.black38,
-          fontWeight: FontWeight.w400,
-          fontSize: 14,
-        ),
-        const SizedBox(height: 16),
-      ],
+      ),
     );
   }
 

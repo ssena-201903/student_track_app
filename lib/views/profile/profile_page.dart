@@ -1,4 +1,6 @@
+// profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:student_track/widgets/custom_text.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -6,27 +8,17 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Öğrenci Profili"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // düzenleme ekranına geç
-            },
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            CustomText(text: "Profilim", color: Colors.indigo, fontWeight: FontWeight.bold, fontSize: 20),
+            const SizedBox(height: 20),
             const CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(
-                'assets/profile_placeholder.png',
-              ), // Profil resmi
+              backgroundColor: Colors.indigo,
+              child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 16),
             _buildInfoTile(title: "İsim", value: "Safiye Yılmaz"),
