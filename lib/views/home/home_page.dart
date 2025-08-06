@@ -87,7 +87,7 @@ class HomePage extends StatelessWidget {
         onPressed: () {},
         icon: Icon(Icons.add),
         label: CustomText(
-          text: "Günlük Soru",
+          text: "Soru Ekle",
           color: Colors.white,
           fontWeight: FontWeight.normal,
           fontSize: 16,
@@ -259,7 +259,7 @@ class BottomCard extends StatelessWidget {
       case 0:
         return Icons.access_time;
       case 1:
-        return Icons.description;
+        return Icons.description_outlined;
       default:
         return Icons.info_outline;
     }

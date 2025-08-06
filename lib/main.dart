@@ -29,11 +29,20 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: Colors.indigo),
+        ),
         textTheme: GoogleFonts.poppinsTextTheme(),
         cardTheme: CardThemeData(color: Constants.primaryWhiteTone),
       ),
 
-      home: LoginPage(),
+      home: MainShell(),
     );
   }
 }
