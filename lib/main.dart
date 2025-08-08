@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/views/login/login_page.dart';
 import 'package:student_track/views/main_shell.dart';
+import 'package:student_track/views/subjects/courses_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,10 +40,10 @@ class MyApp extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: Colors.indigo),
         ),
         textTheme: GoogleFonts.poppinsTextTheme(),
-        cardTheme: CardThemeData(color: Constants.primaryWhiteTone),
+        cardTheme: CardThemeData(color: Constants.primaryWhiteTone, elevation: 1),
       ),
 
-      home: MainShell(),
+      home: CoursesPage(),
     );
   }
 }

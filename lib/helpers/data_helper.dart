@@ -13,7 +13,7 @@ class DataHelper {
 
   static List<Map<String, String>> getBottomCardsData() {
     return [
-      {'title': 'Pomodoro Başlat'},
+      {'title': 'Pomodoro'},
       {'title': 'Denemeler'},
     ];
   }

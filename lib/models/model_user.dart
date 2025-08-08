@@ -2,17 +2,17 @@ class ModelUser {
   String name;
   String school;
   String grade;
-  String age;
   String phone;
   String email;
+  String weeklyStudy;
 
   ModelUser({
     required this.name,
     required this.school,
     required this.grade,
-    required this.age,
     required this.phone,
     required this.email,
+    required this.weeklyStudy,
   });
 
   // JSON'a dönüştürme
@@ -21,9 +21,9 @@ class ModelUser {
       'name': name,
       'school': school,
       'grade': grade,
-      'age': age,
       'phone': phone,
       'email': email,
+      'weeklyStudy': weeklyStudy,
     };
   }
 
@@ -33,9 +33,9 @@ class ModelUser {
       name: json['name'] ?? '',
       school: json['school'] ?? '',
       grade: json['grade'] ?? '',
-      age: json['age'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
+      weeklyStudy: json['weeklyStudy'] ?? '',
     );
   }
 
@@ -44,10 +44,10 @@ class ModelUser {
     return ModelUser(
       name: 'Safiye Yılmaz',
       school: 'İstanbul Lisesi',
-      grade: '11. Sınıf',
-      age: '16',
+      grade: 'yks',
       phone: '+90 555 123 45 67',
       email: 'safiye@example.com',
+      weeklyStudy: '20',
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:student_track/constants/constants.dart';
 import 'package:student_track/views/analysis/analysis_page.dart';
 import 'package:student_track/views/home/home_page.dart';
 import 'package:student_track/views/profile/profile_page.dart';
+import 'package:student_track/views/subjects/courses_page.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -16,9 +17,9 @@ class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const HomePage(),
-    const AnalysisPage(),
-    const ProfilePage(),
+    HomePage(),
+    CoursesPage(),
+    ProfilePage(),
   ];
 
   @override
