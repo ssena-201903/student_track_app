@@ -24,18 +24,13 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Profilim"),
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
         child: Column(
           children: [
-            CustomText(
-              text: "Profilim",
-              color: Constants.primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-            const SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
               backgroundColor: Constants.primaryColor,

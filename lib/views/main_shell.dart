@@ -1,7 +1,6 @@
 // main_shell.dart
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
-import 'package:student_track/views/analysis/analysis_page.dart';
 import 'package:student_track/views/home/home_page.dart';
 import 'package:student_track/views/profile/profile_page.dart';
 import 'package:student_track/views/subjects/courses_page.dart';
@@ -37,8 +36,8 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Ana Sayfa"),
           BottomNavigationBarItem(icon: Icon(Icons.push_pin), label: "Konular"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: "Görevler",
+            icon: Icon(Icons.person),
+            label: "Profilim",
           ),
         ],
       ),

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
+import 'package:student_track/views/pomodoro/pomodo_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
 
@@ -203,8 +204,6 @@ class TopCard extends StatelessWidget {
       height: 120,
       child: Card(
         color: shouldHighlight ? Constants.primaryColor : null,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -270,26 +269,35 @@ class BottomCard extends StatelessWidget {
     return SizedBox(
       width: (MediaQuery.of(context).size.width - 48) / 2,
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(
-                _getIconForIndex(index),
-                color: Constants.primaryColor,
-                size: 24,
-              ),
-              const SizedBox(width: 8),
-              CustomText(
-                text: title,
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-              ),
-            ],
+        child: InkWell(
+          onTap: index == 0
+              ? () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PomodoroPage(),
+                    ),
+                  );
+                }
+              : null, // diğer index'ler için tıklanabilirlik olmayacak
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  _getIconForIndex(index),
+                  color: Constants.primaryColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                CustomText(
+                  text: title,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ],
+            ),
           ),
         ),
       ),
