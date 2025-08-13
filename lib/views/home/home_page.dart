@@ -286,7 +286,7 @@ class BottomCard extends StatelessWidget {
               children: [
                 Icon(
                   _getIconForIndex(index),
-                  color: Constants.primaryColor,
+                  color: Constants.primaryBlackTone,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
