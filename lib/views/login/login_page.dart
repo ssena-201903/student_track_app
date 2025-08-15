@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/views/main_shell.dart';
 import 'package:student_track/widgets/custom_text.dart';
 
 class LoginPage extends StatefulWidget {
@@ -112,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 6),
           CustomText(
             text: "Lütfen giriş için bilgilerinizi giriniz",
-            color: Constants.lightPrimaryTone,
+            color: Constants.primaryColor,
             fontWeight: FontWeight.w400,
             fontSize: (deviceWidth * 0.035).clamp(12.0, 18.0),
           ),
@@ -134,13 +135,13 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
               label: CustomText(
                 text: "E-posta",
-                color: Constants.lightPrimaryTone,
+                color: Constants.primaryColor,
                 fontWeight: FontWeight.normal,
                 fontSize: (deviceWidth * 0.032).clamp(12.0, 16.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.lightPrimaryTone),
+                borderSide: BorderSide(color: Constants.primaryColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -167,13 +168,13 @@ class _LoginPageState extends State<LoginPage> {
             decoration: InputDecoration(
               label: CustomText(
                 text: "Şifre",
-                color: Constants.lightPrimaryTone,
+                color: Constants.primaryColor,
                 fontWeight: FontWeight.normal,
                 fontSize: (deviceWidth * 0.032).clamp(12.0, 16.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.lightPrimaryTone),
+                borderSide: BorderSide(color: Constants.primaryColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -201,6 +202,9 @@ class _LoginPageState extends State<LoginPage> {
                   debugPrint(
                     "Giriş başarılı: ${emailTf.text}, ${passwordTf.text}",
                   );
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (context) => MainShell()));
                 }
               },
               child: const Text(

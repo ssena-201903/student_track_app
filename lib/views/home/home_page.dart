@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
+import 'package:student_track/views/home/add_question_page.dart';
 import 'package:student_track/views/pomodoro/pomodo_page.dart';
 import 'package:student_track/views/targets/target_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
@@ -112,7 +113,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => AddQuestionPage()));
+        },
         icon: Icon(Icons.add),
         label: CustomText(
           text: "Soru Ekle",
@@ -174,10 +179,13 @@ class _HomePageState extends State<HomePage> {
             CustomText(
               text: "${sentence[0]["text"]}",
               color: Constants.primaryColor,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
               fontSize: 16,
+              maxLines: null,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.visible, // wrap
             ),
+
             const SizedBox(height: 10),
             CustomText(
               text: "- ${sentence[0]["writer"]}",
@@ -241,17 +249,26 @@ class BottomCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(
-                  _getIconForIndex(index),
-                  color: Constants.primaryColor,
-                  size: 24,
+                Container(
+                  decoration: BoxDecoration(
+                    color: Constants.lightPrimaryTone, // ikon arka plan rengi
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    _getIconForIndex(index),
+                    color: Constants.primaryColor, // ikon rengi
+                    size: 24,
+                  ),
                 ),
-                const SizedBox(width: 10),
-                CustomText(
-                  text: title,
-                  color: Constants.primaryBlackTone,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: CustomText(
+                    text: title,
+                    color: Colors.black87, // metin rengi
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -296,7 +313,9 @@ class TopCard extends StatelessWidget {
     final bool shouldHighlight =
         index == 2 && int.tryParse(title) != null && int.parse(title) > 0;
 
-    double cardHeight = MediaQuery.of(context).size.height * 0.14; // Tüm kartlar için sabit, cihaz boyutuna göre
+    double cardHeight =
+        MediaQuery.of(context).size.height *
+        0.14; // Tüm kartlar için sabit, cihaz boyutuna göre
 
     return SizedBox(
       width: (MediaQuery.of(context).size.width - 48) / 2,
@@ -338,37 +357,29 @@ class TopCard extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                     ),
-                    // İlerleme çubuğu yalnızca index 3 için
                     if (index == 3) ...[
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(12, (i) {
-                          return Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 2),
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: i < 6
-                                    ? Constants.primaryColor
-                                    : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          );
-                        }),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: LinearProgressIndicator(
+                          value: 0.5, // ilerleme oranı
+                          backgroundColor: Colors.grey[300],
+                          color: Constants.primaryColor,
+                          minHeight: 6,
+                        ),
                       ),
                     ],
                   ],
                 ),
+
                 // Badge
                 if (shouldHighlight)
                   Positioned(
                     top: 2,
                     right: 2,
                     child: Container(
-                      width: 30,
-                      height: 30,
+                      width: 35,
+                      height: 35,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: Constants.primaryColor,

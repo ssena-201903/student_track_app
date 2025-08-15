@@ -223,22 +223,29 @@ class _PomodoroPageState extends State<PomodoroPage> {
           Positioned(
             top: 20,
             right: 20,
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: "Bugünkü Çalışma Süresi: ",
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                  TextSpan(
-                    text: _formatDurationReadable(totalWorkTime),
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Constants.primaryBlackTone,
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Constants.lightPrimaryTone,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "Bugünkü Çalışma Süresi: ",
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
                     ),
-                  ),
-                ],
+                    TextSpan(
+                      text: _formatDurationReadable(totalWorkTime),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Constants.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -306,9 +313,10 @@ class _PomodoroPageState extends State<PomodoroPage> {
                   // Büyük zaman sayacı
                   Text(
                     formattedMinutes,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
+                      color: Constants.primaryBlackTone,
                     ),
                   ),
 

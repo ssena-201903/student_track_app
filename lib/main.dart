@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/views/login/login_page.dart';
 import 'package:student_track/views/main_shell.dart';
 
 void main() {
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
             fontSize: 20,
             fontWeight: FontWeight.w400,
           ),
+          centerTitle: false,
         ),
         // floating action button theme
         floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -72,9 +74,28 @@ class MyApp extends StatelessWidget {
             return null;
           }),
         ),
+        // input decoration theme
+        inputDecorationTheme: InputDecorationTheme(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.primaryColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Constants.primaryColor),
+          ),
+          hintStyle: TextStyle(color: Constants.primaryColor),
+          labelStyle: TextStyle(color: Constants.primaryColor),
+        ),
+        // snackbar theme
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: Colors.black54,
+          contentTextStyle: TextStyle(
+            color: Constants.primaryWhiteTone,
+            fontSize: 16,
+          ),
+        ),
       ),
 
-      home: MainShell(),
+      home: LoginPage(),
     );
   }
 }
