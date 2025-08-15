@@ -26,4 +26,43 @@ class DataHelper {
       },
     ];
   }
+
+  static List<Map<String, dynamic>> getTargetsData = [
+  {
+    "ders": "Matematik",
+    "konu": "Üslü Sayılar",
+    "kitap": "Eis Yayınları",
+    "tarih": DateTime(2025, 8, 15),
+    "tamamlandi": false
+  },
+  {
+    "ders": "Kimya",
+    "konu": "Enerji",
+    "kitap": "Karekök Yayınları",
+    "tarih": DateTime(2025, 8, 14),
+    "tamamlandi": false
+  },
+  {
+    "ders": "Fizik",
+    "konu": "Kuvvet",
+    "kitap": "Palme Yayınları",
+    "tarih": DateTime(2025, 8, 14),
+    "tamamlandi": false
+  },
+  {
+    "ders": "Biyoloji",
+    "konu": "Hücre",
+    "kitap": "Palme Yayınları",
+    "tarih": DateTime(2025, 8, 14),
+    "tamamlandi": false
+  },
+  {
+    "ders": "Fizik",
+    "konu": "Mekanik",
+    "kitap": "Eis Yayınları",
+    "tarih": DateTime(2025, 8, 14),
+    "tamamlandi": false
+  },
+];
+
 }

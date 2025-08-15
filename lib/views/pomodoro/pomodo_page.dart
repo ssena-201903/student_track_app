@@ -99,6 +99,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
           TextButton(
             onPressed: () async {
               await _audioPlayer.stop(); // Ses durdur
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
               startBreak();
             },
@@ -108,6 +109,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
           TextButton(
             onPressed: () async {
               await _audioPlayer.stop();
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
               setState(() {
                 completedPomodoros.add(
@@ -136,6 +138,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
           TextButton(
             onPressed: () async {
               await _audioPlayer.stop(); // Ses durdur
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
               setState(() {
                 remainingTime = workDuration;
@@ -150,6 +153,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
           TextButton(
             onPressed: () async {
               await _audioPlayer.stop(); // Ses durdur
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
               setState(() {
                 completedPomodoros.add(

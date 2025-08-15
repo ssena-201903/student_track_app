@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/views/main_shell.dart';
-import 'package:student_track/views/pomodoro/pomodo_page.dart';
-import 'package:student_track/views/subjects/courses_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +29,7 @@ class MyApp extends StatelessWidget {
         ),
         // floating action button theme
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Constants.primaryColor,
           foregroundColor: Colors.white,
         ),
         // elevated button theme
@@ -53,7 +51,7 @@ class MyApp extends StatelessWidget {
         ),
         // text button theme
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(foregroundColor: Colors.indigo),
+          style: TextButton.styleFrom(foregroundColor: Constants.primaryColor),
         ),
         // text theme
         textTheme: GoogleFonts.poppinsTextTheme(),
@@ -76,7 +74,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: CoursesPage(),
+      home: MainShell(),
     );
   }
 }

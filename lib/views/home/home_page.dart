@@ -3,23 +3,54 @@ import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
 import 'package:student_track/views/pomodoro/pomodo_page.dart';
+import 'package:student_track/views/targets/target_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List firstCards = DataHelper.getTopCardsData();
-    final List todaySentence = DataHelper.getTodaySentence();
-    final List lastCards = DataHelper.getBottomCardsData();
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  final List firstCards = DataHelper.getTopCardsData();
+  final List todaySentence = DataHelper.getTodaySentence();
+  final List lastCards = DataHelper.getBottomCardsData();
+
+  late List<Map<String, dynamic>> targets;
+  int pendingTargetsCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Static metotla targets verisini al
+    targets = DataHelper.getTargetsData;
+
+    // Tamamlanmamış hedefleri say
+    pendingTargetsCount = targets.where((t) => t["tamamlandi"] == false).length;
+  }
+
+  void _updatePendingTargets() {
+    setState(() {
+      pendingTargetsCount = targets
+          .where((t) => t["tamamlandi"] == false)
+          .length;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       drawer: const CustomDrawer(),
       appBar: AppBar(
+        backgroundColor: Constants.primaryColor,
+        foregroundColor: Constants.primaryWhiteTone,
+        elevation: 0,
         title: Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Column(
@@ -34,29 +65,30 @@ class HomePage extends StatelessWidget {
                         TextSpan(
                           text: "Merhaba ",
                           style: TextStyle(
-                            color: Constants.primaryColor,
+                            color: Constants.primaryWhiteTone,
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
                           ),
                         ),
                         TextSpan(
-                          text: "Safiye",
+                          text: "Safiye!",
                           style: TextStyle(
-                            color: Constants.primaryColor,
+                            color: Constants.primaryWhiteTone,
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Icon(Icons.waving_hand, color: Constants.primaryColor),
+                  //Icon(Icons.waving_hand, color: Constants.primaryColor),
                 ],
               ),
+              const SizedBox(height: 6),
               const CustomText(
-                text: "Bugün harika bir gün olacak!",
-                color: Colors.black38,
+                text: "Günün harika geçsin!",
+                color: Colors.white70,
                 fontWeight: FontWeight.w400,
                 fontSize: 14,
               ),
@@ -64,9 +96,6 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Constants.primaryColor,
-        elevation: 0,
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -82,8 +111,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-
-      // floating button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         icon: Icon(Icons.add),
@@ -101,14 +128,33 @@ class HomePage extends StatelessWidget {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: List.generate(
-        cards.length,
-        (index) => TopCard(
+      children: List.generate(cards.length, (index) {
+        // Eğer 3. kart (index 2) hedef kartı ise, title ve subtitle'ı özel yap
+        if (index == 2) {
+          return TopCard(
+            index: index,
+            title: pendingTargetsCount > 0
+                ? pendingTargetsCount.toString()
+                : "0",
+            subTitle: pendingTargetsCount > 0 ? "Yeni Hedef" : "Yeni hedef yok",
+            onTap: () async {
+              // TargetPage'e git
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TargetPage()),
+              );
+              // Geri dönüldüğünde sayıyı güncelle
+              _updatePendingTargets();
+            },
+          );
+        }
+
+        return TopCard(
           index: index,
           title: cards[index]["title"],
           subTitle: cards[index]["subtitle"],
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -120,7 +166,7 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: const Color.fromARGB(255, 224, 227, 245),
+          color: Constants.lightPrimaryTone,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -160,93 +206,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class TopCard extends StatelessWidget {
-  final int index;
-  final String title;
-  final String subTitle;
-
-  const TopCard({
-    super.key,
-    required this.index,
-    required this.title,
-    required this.subTitle,
-  });
-
-  IconData _getIconForIndex(int index) {
-    switch (index) {
-      case 0:
-        return Icons.check_circle_outline;
-      case 1:
-        return Icons.edit;
-      case 2:
-        return Icons.track_changes;
-      case 3:
-        return Icons.timer_outlined;
-      default:
-        return Icons.info_outline;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // 3. elemanın title değeri int'e çevrilmiş hali
-    int? thirdTitleAsInt;
-
-    if (index == 2) {
-      // title string'i int'e çevrilmeye çalışılır (hatalıysa null döner)
-      thirdTitleAsInt = int.tryParse(title);
-    }
-
-    final bool shouldHighlight = index == 2 && (thirdTitleAsInt ?? 0) > 0;
-
-    return SizedBox(
-      width: (MediaQuery.of(context).size.width - 48) / 2,
-      height: 120,
-      child: Card(
-        color: shouldHighlight ? Constants.primaryColor : null,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _getIconForIndex(index),
-                    color: shouldHighlight
-                        ? Colors.white
-                        : Constants.primaryColor,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 8),
-                  CustomText(
-                    text: title,
-                    color: shouldHighlight
-                        ? Colors.white
-                        : Constants.primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: shouldHighlight ? 24 : 22,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              CustomText(
-                text: index == 2
-                    ? (shouldHighlight ? subTitle : "Yeni hedef yok")
-                    : subTitle,
-                color: shouldHighlight ? Colors.white : Colors.black45,
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class BottomCard extends StatelessWidget {
   final int index;
   final String title;
@@ -273,12 +232,10 @@ class BottomCard extends StatelessWidget {
           onTap: index == 0
               ? () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PomodoroPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => PomodoroPage()),
                   );
                 }
-              : null, // diğer index'ler için tıklanabilirlik olmayacak
+              : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             child: Row(
@@ -286,16 +243,145 @@ class BottomCard extends StatelessWidget {
               children: [
                 Icon(
                   _getIconForIndex(index),
-                  color: Constants.primaryBlackTone,
+                  color: Constants.primaryColor,
                   size: 24,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 CustomText(
                   text: title,
-                  color: Colors.black87,
+                  color: Constants.primaryBlackTone,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TopCard extends StatelessWidget {
+  final int index;
+  final String title;
+  final String subTitle;
+  final VoidCallback? onTap;
+
+  const TopCard({
+    super.key,
+    required this.index,
+    required this.title,
+    required this.subTitle,
+    this.onTap,
+  });
+
+  IconData _getIconForIndex(int index) {
+    switch (index) {
+      case 0:
+        return Icons.check_circle_outline;
+      case 1:
+        return Icons.edit;
+      case 2:
+        return Icons.track_changes;
+      case 3:
+        return Icons.timer_outlined;
+      default:
+        return Icons.info_outline;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool shouldHighlight =
+        index == 2 && int.tryParse(title) != null && int.parse(title) > 0;
+
+    double cardHeight = MediaQuery.of(context).size.height * 0.14; // Tüm kartlar için sabit, cihaz boyutuna göre
+
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 48) / 2,
+      height: cardHeight,
+      child: Card(
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _getIconForIndex(index),
+                          color: Constants.primaryColor,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        CustomText(
+                          text: index == 2 && shouldHighlight ? "" : title,
+                          color: Constants.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    CustomText(
+                      text: index == 2
+                          ? (shouldHighlight ? "Yeni Hedef" : "Yeni hedef yok")
+                          : subTitle,
+                      color: Colors.black45,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                    ),
+                    // İlerleme çubuğu yalnızca index 3 için
+                    if (index == 3) ...[
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(12, (i) {
+                          return Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: i < 6
+                                    ? Constants.primaryColor
+                                    : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ],
+                ),
+                // Badge
+                if (shouldHighlight)
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Constants.primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: CustomText(
+                        text: title,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
