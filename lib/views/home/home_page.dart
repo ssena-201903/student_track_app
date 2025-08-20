@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
 import 'package:student_track/views/home/add_question_page.dart';
+import 'package:student_track/views/home/study_hours_page.dart';
 import 'package:student_track/views/pomodoro/pomodo_page.dart';
 import 'package:student_track/views/questions/questions_page.dart';
 import 'package:student_track/views/targets/target_page.dart';
@@ -166,6 +167,22 @@ class _HomePageState extends State<HomePage> {
               );
               // Geri dönüldüğünde sayıyı güncelle
               _updatePendingTargets();
+            },
+          );
+        }
+
+        // Eğer 4. kart (index 3) hedef kartı ise, title ve subtitle'ı özel yap
+        if (index == 3) {
+          return TopCard(
+            index: index,
+            title: cards[index]["title"],
+            subTitle: cards[index]["subtitle"],
+            onTap: () async {
+              // TargetPage'e git
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StudyHoursPage()),
+              );
             },
           );
         }

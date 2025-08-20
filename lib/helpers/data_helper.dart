@@ -7,7 +7,7 @@ class DataHelper {
       {'title': '85%', 'subtitle': 'Hedeflerim'},
       {'title': '127', 'subtitle': 'Haftalık Soru'},
       {'title': '0', 'subtitle': 'Yeni Hedef'},
-      {'title': '6/12', 'subtitle': 'Saat Çalışma'},
+      {'title': '28/84', 'subtitle': 'Saat Çalışma'},
     ];
   }
 

@@ -145,7 +145,16 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              4,
+                            ), 
+                          ),
+                          elevation: 5,
+                          duration: const Duration(seconds: 2),
                           content: Text('Soru başarıyla kaydedildi!'),
                         ),
                       );
