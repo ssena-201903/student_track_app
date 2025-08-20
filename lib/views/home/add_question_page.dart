@@ -154,7 +154,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                     }
                   : null,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 20),
               ),
               child: const Text('Verileri Gönder'),
             ),

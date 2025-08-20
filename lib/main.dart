@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/views/home/home_page.dart';
 import 'package:student_track/views/login/login_page.dart';
 import 'package:student_track/views/main_shell.dart';
+import 'package:student_track/views/questions/questions_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -93,9 +95,20 @@ class MyApp extends StatelessWidget {
             fontSize: 16,
           ),
         ),
+        // tabbar theme
+        tabBarTheme: TabBarThemeData(
+          labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Constants.primaryColor),
+          unselectedLabelColor:
+              Constants.primaryWhiteTone,
+          indicator: BoxDecoration(
+            color: Colors.white, 
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab, 
+        ),
       ),
 
-      home: LoginPage(),
+      home: MainShell(),
     );
   }
 }

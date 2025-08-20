@@ -4,6 +4,7 @@ import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
 import 'package:student_track/views/home/add_question_page.dart';
 import 'package:student_track/views/pomodoro/pomodo_page.dart';
+import 'package:student_track/views/questions/questions_page.dart';
 import 'package:student_track/views/targets/target_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
@@ -134,6 +135,21 @@ class _HomePageState extends State<HomePage> {
       spacing: 10,
       runSpacing: 10,
       children: List.generate(cards.length, (index) {
+        // eğer 2. kart ise index değeri 1 olan kartı kontrol et
+        if (index == 1) {
+          return TopCard(
+            index: index,
+            title: cards[index]["title"],
+            subTitle: cards[index]["subtitle"],
+            onTap: () async {
+              // Questions Page'e git
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QuestionsPage()),
+              );
+            },
+          );
+        }
         // Eğer 3. kart (index 2) hedef kartı ise, title ve subtitle'ı özel yap
         if (index == 2) {
           return TopCard(
