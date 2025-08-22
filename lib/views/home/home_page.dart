@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
+import 'package:student_track/views/exams/exam_page.dart';
 import 'package:student_track/views/home/add_question_page.dart';
 import 'package:student_track/views/home/study_hours_page.dart';
 import 'package:student_track/views/pomodoro/pomodo_page.dart';
@@ -276,7 +277,11 @@ class BottomCard extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => PomodoroPage()),
                   );
                 }
-              : null,
+              : () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const ExamPage()),
+                  );
+                },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             child: Row(

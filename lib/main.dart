@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
-import 'package:student_track/views/home/home_page.dart';
-import 'package:student_track/views/home/study_hours_page.dart';
-import 'package:student_track/views/login/login_page.dart';
 import 'package:student_track/views/main_shell.dart';
-import 'package:student_track/views/questions/questions_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,6 +38,16 @@ class MyApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Constants.primaryColor,
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
+          ),
+        ),
+        // outlined button theme
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Constants.primaryColor,
+            side: BorderSide(color: Constants.primaryColor),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(8),
             ),
