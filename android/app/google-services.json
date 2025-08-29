@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "634186530451",
+    "project_id": "sukrancoach",
+    "storage_bucket": "sukrancoach.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634186530451:android:e054bc9a0fc5ecee889766",
+        "android_client_info": {
+          "package_name": "com.example.student_track"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnqrLd5yaJfab-00v3MNldQRasLf7b3l4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634186530451:android:8da2cd2282a6c140889766",
+        "android_client_info": {
+          "package_name": "com.example.sukrankoc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnqrLd5yaJfab-00v3MNldQRasLf7b3l4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

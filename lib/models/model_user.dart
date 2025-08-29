@@ -1,12 +1,14 @@
 class ModelUser {
-  String name;
-  String school;
-  String grade;
-  String phone;
-  String email;
-  String weeklyStudy;
+  final String id;
+  final String name;
+  final String school;
+  final String grade;
+  final String phone;
+  final String email;
+  final String weeklyStudy;
 
   ModelUser({
+    required this.id,
     required this.name,
     required this.school,
     required this.grade,
@@ -15,39 +17,48 @@ class ModelUser {
     required this.weeklyStudy,
   });
 
-  // JSON'a dönüştürme
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'school': school,
-      'grade': grade,
-      'phone': phone,
-      'email': email,
-      'weeklyStudy': weeklyStudy,
-    };
-  }
-
-  // JSON'dan dönüştürme
-  factory ModelUser.fromJson(Map<String, dynamic> json) {
+  // Varsayılan kullanıcı (Firestore'dan veri çekilemediğinde)
+  factory ModelUser.sample() {
     return ModelUser(
-      name: json['name'] ?? '',
-      school: json['school'] ?? '',
-      grade: json['grade'] ?? '',
-      phone: json['phone'] ?? '',
-      email: json['email'] ?? '',
-      weeklyStudy: json['weeklyStudy'] ?? '',
+      id: "0",
+      name: "Misafir Kullanıcı",
+      school: "Bilinmiyor",
+      grade: "0",
+      phone: "Bilinmiyor",
+      email: "misafir@example.com",
+      weeklyStudy: "0",
     );
   }
 
-  // örnek kullanıcı 
-  factory ModelUser.sample() {
+  ModelUser copyWith({
+    String? id,
+    String? name,
+    String? school,
+    String? grade,
+    String? phone,
+    String? email,
+    String? weeklyStudy,
+  }) {
     return ModelUser(
-      name: 'Safiye Yılmaz',
-      school: 'İstanbul Lisesi',
-      grade: 'yks',
-      phone: '+90 555 123 45 67',
-      email: 'safiye@example.com',
-      weeklyStudy: '20',
+      id: id ?? this.id,
+      name: name ?? this.name,
+      school: school ?? this.school,
+      grade: grade ?? this.grade,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      weeklyStudy: weeklyStudy ?? this.weeklyStudy,
+    );
+  }
+
+  factory ModelUser.fromFirestore(Map<String, dynamic> data, String id) {
+    return ModelUser(
+      id: id,
+      name: data['name'] ?? 'Bilinmiyor',
+      school: data['school'] ?? 'Bilinmiyor',
+      grade: data['course'] ?? '0',
+      phone: data['phone'] ?? 'Bilinmiyor',
+      email: data['email'] ?? 'Bilinmiyor',
+      weeklyStudy: data['weeklyStudyTime'] ?? '0',
     );
   }
 }

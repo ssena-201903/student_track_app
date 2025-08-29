@@ -1,22 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_track/constants/constants.dart';
-import 'package:student_track/views/main_shell.dart';
+import 'package:student_track/features/auth/data/auth_repository.dart';
 import 'package:student_track/widgets/custom_text.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   late TextEditingController emailTf;
   late TextEditingController passwordTf;
-
-  // global form state
   final _formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -98,6 +100,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLoginForm(double deviceWidth) {
+    final authRepo = ref.read(authRepositoryProvider);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -110,82 +114,51 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: (deviceWidth * 0.09).clamp(20.0, 32.0),
             fontFamily: "Caprasimo",
           ),
-          const SizedBox(height: 6),
-          CustomText(
-            text: "Lütfen giriş için bilgilerinizi giriniz",
-            color: Constants.primaryColor,
-            fontWeight: FontWeight.w400,
-            fontSize: (deviceWidth * 0.035).clamp(12.0, 18.0),
-          ),
           const SizedBox(height: 24),
 
-          // E-Posta Alanı
+          // E-posta
           TextFormField(
             controller: emailTf,
-            keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return "E-posta boş olamaz";
               }
-              if (!RegExp(r"^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
-                return "Geçerli bir e-posta girin";
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                return "Geçerli bir e-posta giriniz";
               }
               return null;
             },
-            decoration: InputDecoration(
-              label: CustomText(
-                text: "E-posta",
-                color: Constants.primaryColor,
-                fontWeight: FontWeight.normal,
-                fontSize: (deviceWidth * 0.032).clamp(12.0, 16.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.primaryColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.primaryColor),
-              ),
+            decoration: const InputDecoration(
+              labelText: "E-posta",
+              border: OutlineInputBorder(),
             ),
           ),
-
           const SizedBox(height: 12),
 
-          // Şifre Alanı
+          // Şifre
           TextFormField(
             controller: passwordTf,
-            obscureText: true,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Şifre boş olamaz";
-              }
-              if (value.length < 6) {
-                return "Şifre en az 6 karakter olmalı";
-              }
-              return null;
-            },
+            obscureText: _obscureText,
+            validator: (value) =>
+                value == null || value.length < 6 ? "Şifre en az 6 karakter" : null,
             decoration: InputDecoration(
-              label: CustomText(
-                text: "Şifre",
-                color: Constants.primaryColor,
-                fontWeight: FontWeight.normal,
-                fontSize: (deviceWidth * 0.032).clamp(12.0, 16.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.primaryColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Constants.primaryColor),
+              labelText: "Şifre",
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
               ),
             ),
           ),
-
           const SizedBox(height: 24),
 
-          // Giriş Butonu
+          // Giriş Yap Butonu
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -196,29 +169,50 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // Her şey doğruysa giriş işlemleri yapılabilir
-                  debugPrint(
-                    "Giriş başarılı: ${emailTf.text}, ${passwordTf.text}",
-                  );
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => MainShell()));
-                }
-              },
-              child: const Text(
-                "Giriş Yap",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() => isLoading = true);
+                        try {
+                          await authRepo.signIn(
+                            email: emailTf.text.trim(),
+                            password: passwordTf.text.trim(),
+                          );
+                          // AuthWrapper yönlendirecek
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(_handleAuthError(e))),
+                          );
+                        } finally {
+                          if (mounted) setState(() => isLoading = false);
+                        }
+                      }
+                    },
+              child: Text(
+                isLoading ? "Giriş Yapılıyor..." : "Giriş Yap",
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _handleAuthError(dynamic e) {
+    if (e is FirebaseAuthException) {
+      switch (e.code) {
+        case 'user-not-found':
+          return 'Kullanıcı bulunamadı.';
+        case 'wrong-password':
+          return 'Yanlış şifre girdiniz.';
+        case 'invalid-email':
+          return 'Geçersiz e-posta adresi.';
+        default:
+          return 'Bir hata oluştu: ${e.message}';
+      }
+    }
+    return 'Bilinmeyen bir hata oluştu.';
   }
 }

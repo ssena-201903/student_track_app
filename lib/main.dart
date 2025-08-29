@@ -1,13 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_track/constants/constants.dart';
-import 'package:student_track/views/main_shell.dart';
+import 'package:student_track/firebase_options.dart';
+import 'package:student_track/views/auth_wrapper.dart';
 
-void main() {
-  runApp(
-    const ProviderScope(child: MyApp())
-  );
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    print('Firebase başlatma hatası: $e');
+  }
+  
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -118,7 +128,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: MainShell(),
+      home: AuthWrapper(),
     );
   }
 }

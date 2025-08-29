@@ -1,58 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/providers/user_provider.dart';
 import 'package:student_track/widgets/custom_text.dart';
-import 'package:student_track/models/model_user.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  late ModelUser currentUser;
-
-  @override
-  void initState() {
-    super.initState();
-    currentUser = ModelUser.sample(); // İleride veritabanından çekilecek
-  }
-
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final userAsync = ref.watch(userProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profilim"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Constants.primaryColor,
-              child: const Icon(Icons.person, size: 50, color: Colors.white),
+      body: userAsync.when(
+        data: (currentUser) => Padding(
+          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Constants.primaryColor,
+                  child: const Icon(Icons.person, size: 50, color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+            
+                // Alanlar
+                _buildEditableTile(
+                  title: "name",
+                  value: currentUser.name,
+                  onSave: (value) => ref.read(userProvider.notifier).updateField("name", value),
+                ),
+                _buildEditableTile(
+                  title: "school",
+                  value: currentUser.school,
+                  onSave: (value) => ref.read(userProvider.notifier).updateField("school", value),
+                ),
+                _buildStaticTile(title: "course", value: currentUser.grade),
+                _buildEditableTile(
+                  title: "phone",
+                  value: currentUser.phone,
+                  onSave: (value) => ref.read(userProvider.notifier).updateField("phone", value),
+                  isPhone: true,
+                ),
+                _buildStaticTile(title: "email", value: currentUser.email),
+                _buildStaticTile(title: "weeklyStudy", value: currentUser.weeklyStudy),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Alanlar
-            _buildEditableTile(title: "name", value: currentUser.name),
-            _buildEditableTile(title: "school", value: currentUser.school),
-            _buildStaticTile(title: "course", value: currentUser.grade),
-            _buildEditableTile(title: "phone", value: currentUser.phone),
-            _buildStaticTile(title: "email", value: currentUser.email),
-            _buildStaticTile(title: "weeklyStudy", value: currentUser.weeklyStudy),
-          ],
+          ),
         ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('Hata: $error')),
       ),
     );
   }
 
   /// Düzenlenebilir alanlar için
-  Widget _buildEditableTile({required String title, required String value}) {
+  Widget _buildEditableTile({
+    required String title,
+    required String value,
+    required void Function(String) onSave,
+    bool isPhone = false,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -63,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
         trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
-            _showEditDialog(title, value);
+            _showEditDialog(title, value, isPhone, onSave);
           },
         ),
       ),
@@ -103,24 +122,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String getLocalizedTitle(String fieldKey) {
-  switch (fieldKey) {
-    case "name":
-      return "Ad";
-    case "school":
-      return "Okul";
-    case "course":
-      return "Sınıf";
-    case "phone":
-      return "Telefon";
-    case "email":
-      return "E-posta";
-    case "weeklyStudy":
-      return "Haftalık Çalışma Saati";
-    default:
-      return fieldKey;
+    switch (fieldKey) {
+      case "name":
+        return "Ad";
+      case "school":
+        return "Okul";
+      case "course":
+        return "Sınıf";
+      case "phone":
+        return "Telefon";
+      case "email":
+        return "E-posta";
+      case "weeklyStudy":
+        return "Haftalık Çalışma Saati";
+      default:
+        return fieldKey;
+    }
   }
-}
-
 
   List<TextInputFormatter> _getInputFormatters(String title) {
     switch (title) {
@@ -131,12 +149,17 @@ class _ProfilePageState extends State<ProfilePage> {
         ];
       case "school":
         return [LengthLimitingTextInputFormatter(100)];
+      case "weeklyStudy":
+        return [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(3),
+        ];
       default:
         return [LengthLimitingTextInputFormatter(255)];
     }
   }
 
-  void _showEditDialog(String title, String currentValue) {
+  void _showEditDialog(String title, String currentValue, bool isPhone, void Function(String) onSave) {
     final controller = TextEditingController(text: currentValue);
 
     showDialog(
@@ -163,19 +186,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontSize: 16,
                   ),
                   const SizedBox(height: 12),
-                  title == "Telefon"
+                  isPhone
                       ? IntlPhoneField(
                           initialValue: currentValue,
                           decoration: const InputDecoration(
                             labelText: 'Telefon Numarası',
                             border: OutlineInputBorder(),
-                            counterText: '', // Karakter sayacını gizle
+                            counterText: '',
                           ),
                           initialCountryCode: 'TR',
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(
-                              14,
-                            ), // Max 14 karakter
+                            LengthLimitingTextInputFormatter(14),
                           ],
                           onChanged: (phone) {
                             controller.text = phone.completeNumber;
@@ -185,13 +206,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           controller: controller,
                           inputFormatters: _getInputFormatters(title),
                           decoration: InputDecoration(
-                            hintText: "$title giriniz",
+                            labelText: getLocalizedTitle(title),
                             border: const OutlineInputBorder(),
-                            counterText: title == "Yaş"
-                                ? null
-                                : '', // Yaş için sayacı göster
                           ),
-                          keyboardType: title == "Yaş"
+                          keyboardType: title == "weeklyStudy"
                               ? TextInputType.number
                               : TextInputType.text,
                         ),
@@ -207,23 +225,16 @@ class _ProfilePageState extends State<ProfilePage> {
                       ElevatedButton(
                         child: const Text("Kaydet"),
                         onPressed: () {
-                          setState(() {
-                            switch (title) {
-                              case "name":
-                                currentUser.name = controller.text;
-                                break;
-                              case "school":
-                                currentUser.school = controller.text;
-                                break;
-                              case "weeklyStudy":
-                                currentUser.weeklyStudy = controller.text;
-                                break;
-                              case "Telefon":
-                                currentUser.phone = controller.text;
-                                break;
-                            }
-                          });
-                          Navigator.pop(context);
+                          if (controller.text.isNotEmpty) {
+                            onSave(controller.text);
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("${getLocalizedTitle(title)} boş olamaz"),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ],
