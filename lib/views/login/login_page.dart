@@ -42,7 +42,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // eğer ekran genişliği yükseklikten fazlaysa yataydadır
+          // Eğer ekran genişliği yükseklikten fazlaysa yataydadır
           final isLandscape = constraints.maxWidth > constraints.maxHeight;
           final contentWidth = isLandscape
               ? 500.0
@@ -114,11 +114,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             fontSize: (deviceWidth * 0.09).clamp(20.0, 32.0),
             fontFamily: "Caprasimo",
           ),
+          const SizedBox(height: 6),
+          CustomText(
+            text: "Lütfen giriş için bilgilerinizi giriniz",
+            color: Constants.primaryColor,
+            fontWeight: FontWeight.w400,
+            fontSize: (deviceWidth * 0.035).clamp(12.0, 18.0),
+          ),
           const SizedBox(height: 24),
 
           // E-posta
           TextFormField(
             controller: emailTf,
+            keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return "E-posta boş olamaz";

@@ -39,18 +39,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 _buildEditableTile(
                   title: "name",
                   value: currentUser.name,
-                  onSave: (value) => ref.read(userProvider.notifier).updateField("name", value),
+                  onSave: (value) => _updateFieldAndShowFeedback("name", value),
                 ),
                 _buildEditableTile(
                   title: "school",
                   value: currentUser.school,
-                  onSave: (value) => ref.read(userProvider.notifier).updateField("school", value),
+                  onSave: (value) => _updateFieldAndShowFeedback("school", value),
                 ),
                 _buildStaticTile(title: "course", value: currentUser.grade),
                 _buildEditableTile(
                   title: "phone",
                   value: currentUser.phone,
-                  onSave: (value) => ref.read(userProvider.notifier).updateField("phone", value),
+                  onSave: (value) => _updateFieldAndShowFeedback("phone", value),
                   isPhone: true,
                 ),
                 _buildStaticTile(title: "email", value: currentUser.email),
@@ -63,6 +63,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         error: (error, _) => Center(child: Text('Hata: $error')),
       ),
     );
+  }
+
+  Future<void> _updateFieldAndShowFeedback(String key, String value) async {
+    try {
+      await ref.read(userProvider.notifier).updateField(key, value);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("${getLocalizedTitle(key)} güncellendi"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text("Güncelleme başarısız: $e"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   /// Düzenlenebilir alanlar için
@@ -231,7 +252,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                backgroundColor: Colors.redAccent,
                                 content: Text("${getLocalizedTitle(title)} boş olamaz"),
+                                behavior: SnackBarBehavior.floating,
                               ),
                             );
                           }
