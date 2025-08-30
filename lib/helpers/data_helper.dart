@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DataHelper {
@@ -29,7 +31,30 @@ class DataHelper {
     ];
   }
 
-static Future<List<Map<String, dynamic>>> getTargetsData(String studentId) async {
+
+  // get today sentences data from firestore
+  static Future<Map<String, dynamic>> getRandomQuote() async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('words')
+        .doc('metadata')
+        .collection('quotes')
+        .get();
+    
+    if (querySnapshot.docs.isNotEmpty) {
+      final random = Random();
+      final randomDoc = querySnapshot.docs[random.nextInt(querySnapshot.docs.length)];
+      return {
+        'owner': randomDoc['owner'],
+        'speech': randomDoc['speech'],
+      };
+    }
+    return {'owner': 'Bilinmeyen', 'speech': 'Hiçbir söz bulunamadı.'};
+  }
+
+  // get targets data from firestore
+  static Future<List<Map<String, dynamic>>> getTargetsData(
+    String studentId,
+  ) async {
     try {
       // Öğrencinin dokümanını al
       DocumentSnapshot studentDoc = await FirebaseFirestore.instance
@@ -55,7 +80,9 @@ static Future<List<Map<String, dynamic>>> getTargetsData(String studentId) async
         // id'yi _ ile ayır
         List<String> idParts = id.split('_');
         String topicId = idParts[0]; // alt tireye kadar olan kısım
-        String sourceName = idParts.length > 1 ? idParts[1] : ''; // alt tireden sonraki kısım
+        String sourceName = idParts.length > 1
+            ? idParts[1]
+            : ''; // alt tireden sonraki kısım
 
         // konular koleksiyonundan konu ve ders bilgisini al
         DocumentSnapshot topicDoc = await FirebaseFirestore.instance
@@ -71,7 +98,8 @@ static Future<List<Map<String, dynamic>>> getTargetsData(String studentId) async
             'ders': topicDoc['ders'] ?? 'Bilinmiyor',
             'konu': topicDoc['konu'] ?? 'Bilinmiyor',
             'kitap': sourceName,
-            'tarih': targetData['targetDate']?.toString() ?? 'Tarih belirtilmemiş',
+            'tarih':
+                targetData['targetDate']?.toString() ?? 'Tarih belirtilmemiş',
             'tamamlandi': targetData['completed'] ?? false,
           });
         }
@@ -83,5 +111,4 @@ static Future<List<Map<String, dynamic>>> getTargetsData(String studentId) async
       return [];
     }
   }
-
 }

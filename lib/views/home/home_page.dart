@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
+import 'package:student_track/providers/user_provider.dart';
 import 'package:student_track/views/exams/exam_page.dart';
 import 'package:student_track/views/home/add_question_page.dart';
 import 'package:student_track/views/home/study_hours_page.dart';
@@ -10,21 +12,22 @@ import 'package:student_track/views/targets/target_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
 
-class HomePage extends StatefulWidget {
-  final String studentId; // Öğrenci ID'si
+class HomePage extends ConsumerStatefulWidget {
+  final String studentId; // added studentId parameter
 
   const HomePage({super.key, required this.studentId});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final List firstCards = DataHelper.getTopCardsData();
   final List todaySentence = DataHelper.getTodaySentence();
   final List lastCards = DataHelper.getBottomCardsData();
 
   List<Map<String, dynamic>> targets = [];
+  Map<String, dynamic>? todayQuote;
   int pendingTargetsCount = 0;
   bool isLoading = true;
 
@@ -32,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _fetchTargets();
+    _fetchRandomQuote();
   }
 
   Future<void> _fetchTargets() async {
@@ -39,21 +43,30 @@ class _HomePageState extends State<HomePage> {
       isLoading = true;
     });
     try {
-      targets = await DataHelper.getTargetsData(widget.studentId);
-      setState(() {
-        // Sadece tarihi bugünden ileri ve tamamlanmamış hedefleri say
-        final now = DateTime.now();
-        pendingTargetsCount = targets.where((t) {
-          if (t['tamamlandi'] == true) return false;
-          try {
-            final targetDate = DateTime.parse(t['tarih']);
-            return targetDate.isAfter(now) || targetDate.isAtSameMomentAs(now);
-          } catch (e) {
-            return false; // Geçersiz tarih formatı varsa bu hedefi dahil etme
-          }
-        }).length;
-        isLoading = false;
-      });
+      final userAsyncValue = await ref.read(userProvider.future); // Await the userProvider future
+      if (userAsyncValue.id.isNotEmpty) { // if studentId is valid
+        targets = await DataHelper.getTargetsData(widget.studentId);
+        setState(() {
+          final now = DateTime.now();
+          pendingTargetsCount = targets.where((t) {
+            if (t['tamamlandi'] == true) return false;
+            try {
+              final targetDate = DateTime.parse(t['tarih']);
+              return targetDate.isAfter(now) || targetDate.isAtSameMomentAs(now);
+            } catch (e) {
+              return false;
+            }
+          }).length;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kullanıcı kimliği geçersiz.')),
+        );
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -64,8 +77,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _fetchRandomQuote() async {
+    try {
+      final quote = await DataHelper.getRandomQuote();
+      setState(() {
+        todayQuote = quote;
+      });
+    } catch (e) {
+      setState(() {
+        todayQuote = {'owner': 'Bilinmeyen', 'speech': 'Söz yüklenemedi: $e'};
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userAsyncValue = ref.watch(userProvider);
     double deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -74,53 +101,60 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Constants.primaryColor,
         foregroundColor: Constants.primaryWhiteTone,
         elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
+        title: userAsyncValue.when(
+          data: (user) {
+            final firstName = user.name.split(' ').isNotEmpty ? user.name.split(' ')[0] : 'Kullanıcı';
+            return Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Merhaba ",
-                          style: TextStyle(
-                            color: Constants.primaryWhiteTone,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
+                  Row(
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Merhaba ",
+                              style: TextStyle(
+                                color: Constants.primaryWhiteTone,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "$firstName!",
+                              style: TextStyle(
+                                color: Constants.primaryWhiteTone,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        TextSpan(
-                          text: "Safiye!",
-                          style: TextStyle(
-                            color: Constants.primaryWhiteTone,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(height: 6),
+                  const CustomText(
+                    text: "Günün harika geçsin!",
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
-              const SizedBox(height: 6),
-              const CustomText(
-                text: "Günün harika geçsin!",
-                color: Colors.white70,
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => const Center(child: Text('Kullanıcı yüklenemedi')),
         ),
       ),
       backgroundColor: Colors.white,
-      body: isLoading
+      body: isLoading || todayQuote == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -129,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   const SizedBox(height: 20),
                   _buildTopCards(firstCards),
-                  _buildTodaySentence(todaySentence, deviceWidth),
+                  _buildTodaySentence(todayQuote!, deviceWidth),
                   _buildBottomCards(lastCards),
                   const SizedBox(height: 20),
                 ],
@@ -184,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (_) => TargetPage(studentId: widget.studentId),
                 ),
               );
-              await _fetchTargets(); // Geri dönüldüğünde hedefleri güncelle
+              await _fetchTargets(); // refresh targets after returning
             },
           );
         }
@@ -210,7 +244,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTodaySentence(List sentence, double deviceWidth) {
+  Widget _buildTodaySentence(Map<String, dynamic> quote, double deviceWidth) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
@@ -224,7 +258,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CustomText(
-              text: "${sentence[0]["text"]}",
+              text: quote['speech'],
               color: Constants.primaryColor,
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -234,7 +268,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             CustomText(
-              text: "- ${sentence[0]["writer"]}",
+              text: "- ${quote['owner']}",
               color: Colors.black54,
               fontWeight: FontWeight.w200,
               fontSize: 14,
