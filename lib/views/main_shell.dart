@@ -24,8 +24,8 @@ class _MainShellState extends State<MainShell> {
     // Oturum açan kullanıcının ID'sini al
     final String studentId = FirebaseAuth.instance.currentUser!.uid;
     _pages = [
-      HomePage(studentId: studentId),
-      CoursesPage(),
+      HomePage(studentId: studentId,),
+      CoursesPage(studentId: studentId,),
       ProfilePage(),
     ];
   }

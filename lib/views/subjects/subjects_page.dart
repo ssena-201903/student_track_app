@@ -1,120 +1,188 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/views/subjects/courses_page.dart'; // konuListProvider burada
 import 'package:student_track/widgets/custom_text.dart';
 
-class SubjectsPage extends StatefulWidget {
+class SubjectsPage extends ConsumerWidget {
   final String title;
-  const SubjectsPage({super.key, required this.title});
+  final String studentId;
+  final String? konuId; // nullable
+
+  const SubjectsPage({
+    super.key,
+    required this.title,
+    required this.studentId,
+    required this.konuId,
+  });
 
   @override
-  State<SubjectsPage> createState() => _SubjectsPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final konuListAsync = ref.watch(konuListProvider);
 
-class _SubjectsPageState extends State<SubjectsPage> {
-  final Map<String, List<BookItem>> subjects = {
-    "Kuvvet": [
-      BookItem(name: "Fizik Soru Bankası - Kuvvet", isRead: false),
-      BookItem(name: "Kuvvet Konu Anlatımı", isRead: true),
-      BookItem(name: "TYT Fizik Kuvvet Testleri", isRead: false),
-      BookItem(name: "Palme Yayınları Kuvvet Fasikülü", isRead: true),
-    ],
-    "İş, Güç, Enerji": [
-      BookItem(name: "Enerji ve Güç - TYT Soru Kitabı", isRead: false),
-      BookItem(name: "Fizik Defteri - Enerji", isRead: false),
-      BookItem(name: "İş ve Güç Konu Anlatımı", isRead: true),
-      BookItem(name: "Enerji Soruları - Final Yayınları", isRead: false),
-    ],
-    "Hareket": [
-      BookItem(name: "TYT Fizik - Hareket Soru Bankası", isRead: true),
-      BookItem(name: "Hareket Konu Özetleri", isRead: false),
-      BookItem(name: "Hız - Zaman - Yer Grafik Çalışmaları", isRead: false),
-    ],
-    "Newton'un Hareket Yasaları": [
-      BookItem(name: "Newton Yasaları - Konu Anlatımı", isRead: true),
-      BookItem(name: "TYT Newton Test Kitabı", isRead: false),
-      BookItem(name: "Üç Yayın Newton Çıkmış Sorular", isRead: false),
-    ],
-    "Basit Makineler": [
-      BookItem(name: "Basit Makineler - Soru Kitabı", isRead: true),
-      BookItem(name: "Konu Anlatımı - Basit Makineler", isRead: true),
-      BookItem(name: "Fizik Kitapçığı - Makaralar", isRead: false),
-    ],
-    "Ağırlık Merkezi": [
-      BookItem(name: "Ağırlık Merkezi Çözümlü Sorular", isRead: false),
-      BookItem(name: "TYT Fizik - Ağırlık Merkezi Fasikülü", isRead: true),
-      BookItem(name: "Palme Yayınları - Ağırlık Merkezi", isRead: false),
-    ],
-    "Tork ve Denge": [
-      BookItem(name: "Denge Soruları - Seçkin Yayıncılık", isRead: false),
-      BookItem(name: "Tork Konu Notları", isRead: false),
-      BookItem(name: "TYT Tork ve Denge Denemeleri", isRead: true),
-    ],
-  };
-
-  double calculateProgress(List<BookItem> books) {
-    if (books.isEmpty) return 0.0;
-    int readCount = books.where((b) => b.isRead).length;
-    return readCount / books.length;
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         backgroundColor: Constants.primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(8),
-        children: subjects.entries.map((entry) {
-          final subjectName = entry.key;
-          final bookList = entry.value;
-          final progressValue = calculateProgress(bookList);
+      body: konuListAsync.when(
+        data: (konuDocs) {
+          // Seçilen derse ait konuları filtrele
+          final filteredKonular = konuDocs
+              .where((doc) => (doc['ders'] as String) == title)
+              .toList();
 
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 6),
-            child: ExpansionTile(
-              title: Row(
-                children: [
-                  // Başlık (uzun olursa kısalt)
-                  Expanded(
-                    child: CustomText(text: subjectName, color: Constants.primaryBlackTone, fontWeight: FontWeight.w600, fontSize: 16, maxLines: 1, overflow: TextOverflow.ellipsis),
+          return StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('students')
+                .doc(studentId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: CustomText(
+                    text: 'Hata oluştu: ${snapshot.error}',
+                    color: Colors.red,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
-                  const SizedBox(width: 10),
-                  // Progress bar
-                  SizedBox(
-                    width: 80,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: progressValue,
-                        backgroundColor: Colors.grey.shade300,
-                        color: Constants.primaryColor,
-                        minHeight: 6,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  // Yüzde metni
-                  CustomText(text: "${(progressValue * 100).toStringAsFixed(0)}%", color: Constants.primaryBlackTone, fontWeight: FontWeight.bold, fontSize: 12)
-                ],
-              ),
-
-              children: bookList.map((book) {
-                return CheckboxListTile(
-                  title: CustomText(text: book.name, color: Constants.primaryBlackTone, fontWeight: FontWeight.normal, fontSize: 14),
-                  value: book.isRead,
-                  onChanged: (val) {
-                    setState(() {
-                      book.isRead = val ?? false;
-                    });
-                  },
                 );
-              }).toList(),
-            ),
+              }
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Center(
+                  child: CustomText(
+                    text: 'Veri bulunamadı.',
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                );
+              }
+
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+              final courseBooks =
+                  data['courseBooks'] as Map<String, dynamic>? ?? {};
+              final topicBookTargets =
+                  data['topicBookTargets'] as Map<String, dynamic>? ?? {};
+
+              return ListView(
+                padding: const EdgeInsets.all(8),
+                children: filteredKonular.map((konuDoc) {
+                  final konuName = konuDoc['konu'] as String;
+                  final currentKonuId = konuDoc.id;
+
+                  // Kitapları topla
+                  final books = <BookItem>[];
+                  if (courseBooks.containsKey(title)) {
+                    final courseBookList =
+                        courseBooks[title] as List<dynamic>? ?? [];
+                    for (var book in courseBookList) {
+                      final bookName = book.toString();
+                      String cleanBookName = bookName;
+                      if (bookName.startsWith('$title')) {
+                        cleanBookName = bookName
+                            .replaceFirst('$title', '')
+                            .replaceFirst('_', '');
+                      }
+                      final targetKey = '${currentKonuId}_$cleanBookName';
+                      final completed =
+                          topicBookTargets[targetKey]?['completed'] ?? false;
+                      books.add(
+                          BookItem(name: cleanBookName, isRead: completed));
+                    }
+                  }
+
+                  final progressValue = books.isNotEmpty
+                      ? books.where((b) => b.isRead).length / books.length
+                      : 0.0;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    child: ExpansionTile(
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: CustomText(
+                              text: konuName,
+                              color: Constants.primaryBlackTone,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: 80,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: LinearProgressIndicator(
+                                value: progressValue,
+                                backgroundColor: Colors.grey.shade300,
+                                color: Constants.primaryColor,
+                                minHeight: 6,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          CustomText(
+                            text:
+                                "${(progressValue * 100).toStringAsFixed(0)}%",
+                            color: Constants.primaryBlackTone,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ],
+                      ),
+                      children: books.map((book) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: CustomText(
+                                  text: book.name,
+                                  color: Constants.primaryBlackTone,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              CustomText(
+                                text: book.isRead
+                                    ? 'Tamamlandı'
+                                    : 'Devam Ediyor',
+                                color: book.isRead
+                                    ? Constants.primaryColor
+                                    : Colors.black54,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           );
-        }).toList(),
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: CustomText(
+            text: 'Veri yüklenemedi: $error',
+            color: Colors.red,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
       ),
     );
   }
@@ -122,7 +190,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
 
 class BookItem {
   final String name;
-  bool isRead;
+  final bool isRead;
 
   BookItem({required this.name, this.isRead = false});
 }

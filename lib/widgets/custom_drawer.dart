@@ -61,7 +61,6 @@ class CustomDrawer extends ConsumerWidget {
             title: Text('Denemelerim'),
             onTap: () {
               Navigator.pop(context);
-              // Navigate to Denemelerim page
               Navigator.push(context, MaterialPageRoute(builder: (context) => ExamPage()));
             },
           ),
@@ -70,7 +69,6 @@ class CustomDrawer extends ConsumerWidget {
             title: Text('Kitaplarım'),
             onTap: () {
               Navigator.pop(context);
-              // Navigate to Kitaplarım page
               Navigator.push(context, MaterialPageRoute(builder: (context) => StudentBooksPage()));
             },
           ),
@@ -79,8 +77,20 @@ class CustomDrawer extends ConsumerWidget {
             title: Text('Konularım'),
             onTap: () {
               Navigator.pop(context);
-              // Navigate to Konularım page
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CoursesPage()));
+              userAsync.when(
+                data: (user) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CoursesPage(studentId: user.id),
+                    ),
+                  );
+                },
+                loading: () => {},
+                error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Kullanıcı yüklenemedi: $error')),
+                ),
+              );
             },
           ),
           ListTile(

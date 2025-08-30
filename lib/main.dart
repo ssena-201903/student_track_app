@@ -32,13 +32,14 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         // app bar theme
         appBarTheme: AppBarTheme(
-          backgroundColor: Constants.primaryColor,
-          foregroundColor: Colors.white,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
+          shape: const Border(
+            bottom: BorderSide(
+              color: Colors.black12,
+              width: 1,
+            ),
           ),
+          backgroundColor: Constants.lightPrimaryTone,
+          foregroundColor: Constants.primaryColor,
           centerTitle: false,
         ),
         // floating action button theme
@@ -125,6 +126,14 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(4)),
           ),
           indicatorSize: TabBarIndicatorSize.tab, 
+        ),
+        //  bottom navigation bar theme
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Constants.primaryWhiteTone,
+          selectedItemColor: Constants.primaryColor,
+          unselectedItemColor: Constants.primaryWhiteTone,
+          selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
         ),
         // proggress indicator theme
         progressIndicatorTheme: ProgressIndicatorThemeData(

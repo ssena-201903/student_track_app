@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
+import 'package:student_track/widgets/custom_text.dart';
 
 class PomodoroPage extends StatefulWidget {
   const PomodoroPage({super.key});
@@ -210,11 +211,8 @@ class _PomodoroPageState extends State<PomodoroPage> {
         actions: [
           TextButton.icon(
             onPressed: resetTimer,
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            label: const Text(
-              "Yeniden Başlat",
-              style: TextStyle(color: Colors.white),
-            ),
+            icon: Icon(Icons.refresh, color: Constants.primaryColor),
+            label: CustomText(text: "Yeniden Başlat", color: Constants.primaryColor, fontWeight: FontWeight.w600, fontSize: 14)
           ),
         ],
       ),

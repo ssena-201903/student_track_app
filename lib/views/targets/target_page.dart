@@ -95,7 +95,7 @@ class _TargetPageState extends State<TargetPage> with SingleTickerProviderStateM
         bottom: TabBar(
           controller: _tabController,
           labelColor: Constants.primaryColor,
-          unselectedLabelColor: Constants.primaryWhiteTone,
+          unselectedLabelColor: Constants.primaryColor,
           indicatorColor: Constants.primaryColor,
           tabs: const [
             Tab(text: 'Yapılacaklar'),
