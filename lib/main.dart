@@ -126,6 +126,10 @@ class MyApp extends StatelessWidget {
           ),
           indicatorSize: TabBarIndicatorSize.tab, 
         ),
+        // proggress indicator theme
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+          color: Constants.primaryColor,
+        ),
       ),
 
       home: AuthWrapper(),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/providers/user_provider.dart';
 import 'package:student_track/views/exams/exam_page.dart';
+import 'package:student_track/views/home/student_books_page.dart';
 import 'package:student_track/views/subjects/courses_page.dart';
 import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/features/auth/data/auth_repository.dart';
@@ -64,7 +65,15 @@ class CustomDrawer extends ConsumerWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ExamPage()));
             },
           ),
-          ListTile(leading: Icon(Icons.book), title: Text('Kitaplarım')),
+          ListTile(
+            leading: Icon(Icons.book), 
+            title: Text('Kitaplarım'),
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to Kitaplarım page
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentBooksPage()));
+            },
+          ),
           ListTile(
             leading: Icon(Icons.push_pin), 
             title: Text('Konularım'),

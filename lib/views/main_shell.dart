@@ -1,4 +1,5 @@
 // main_shell.dart
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/views/home/home_page.dart';
@@ -15,11 +16,19 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    HomePage(),
-    CoursesPage(),
-    ProfilePage(),
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    // Oturum açan kullanıcının ID'sini al
+    final String studentId = FirebaseAuth.instance.currentUser!.uid;
+    _pages = [
+      HomePage(studentId: studentId),
+      CoursesPage(),
+      ProfilePage(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

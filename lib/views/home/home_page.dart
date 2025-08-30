@@ -1,4 +1,3 @@
-// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:student_track/constants/constants.dart';
 import 'package:student_track/helpers/data_helper.dart';
@@ -12,7 +11,9 @@ import 'package:student_track/widgets/custom_text.dart';
 import 'package:student_track/widgets/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String studentId; // Öğrenci ID'si
+
+  const HomePage({super.key, required this.studentId});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,26 +24,44 @@ class _HomePageState extends State<HomePage> {
   final List todaySentence = DataHelper.getTodaySentence();
   final List lastCards = DataHelper.getBottomCardsData();
 
-  late List<Map<String, dynamic>> targets;
+  List<Map<String, dynamic>> targets = [];
   int pendingTargetsCount = 0;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-
-    // Static metotla targets verisini al
-    targets = DataHelper.getTargetsData;
-
-    // Tamamlanmamış hedefleri say
-    pendingTargetsCount = targets.where((t) => t["tamamlandi"] == false).length;
+    _fetchTargets();
   }
 
-  void _updatePendingTargets() {
+  Future<void> _fetchTargets() async {
     setState(() {
-      pendingTargetsCount = targets
-          .where((t) => t["tamamlandi"] == false)
-          .length;
+      isLoading = true;
     });
+    try {
+      targets = await DataHelper.getTargetsData(widget.studentId);
+      setState(() {
+        // Sadece tarihi bugünden ileri ve tamamlanmamış hedefleri say
+        final now = DateTime.now();
+        pendingTargetsCount = targets.where((t) {
+          if (t['tamamlandi'] == true) return false;
+          try {
+            final targetDate = DateTime.parse(t['tarih']);
+            return targetDate.isAfter(now) || targetDate.isAtSameMomentAs(now);
+          } catch (e) {
+            return false; // Geçersiz tarih formatı varsa bu hedefi dahil etme
+          }
+        }).length;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hedefler yüklenirken hata oluştu: $e')),
+      );
+    }
   }
 
   @override
@@ -86,7 +105,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  //Icon(Icons.waving_hand, color: Constants.primaryColor),
                 ],
               ),
               const SizedBox(height: 6),
@@ -102,24 +120,26 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            _buildTopCards(firstCards),
-            _buildTodaySentence(todaySentence, deviceWidth),
-            _buildBottomCards(lastCards),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildTopCards(firstCards),
+                  _buildTodaySentence(todaySentence, deviceWidth),
+                  _buildBottomCards(lastCards),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (context) => AddQuestionPage()));
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => AddQuestionPage()),
+          );
         },
         icon: Icon(Icons.add),
         label: CustomText(
@@ -137,14 +157,12 @@ class _HomePageState extends State<HomePage> {
       spacing: 10,
       runSpacing: 10,
       children: List.generate(cards.length, (index) {
-        // eğer 2. kart ise index değeri 1 olan kartı kontrol et
         if (index == 1) {
           return TopCard(
             index: index,
             title: cards[index]["title"],
             subTitle: cards[index]["subtitle"],
             onTap: () async {
-              // Questions Page'e git
               await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const QuestionsPage()),
@@ -152,7 +170,6 @@ class _HomePageState extends State<HomePage> {
             },
           );
         }
-        // Eğer 3. kart (index 2) hedef kartı ise, title ve subtitle'ı özel yap
         if (index == 2) {
           return TopCard(
             index: index,
@@ -161,25 +178,22 @@ class _HomePageState extends State<HomePage> {
                 : "0",
             subTitle: pendingTargetsCount > 0 ? "Yeni Hedef" : "Yeni hedef yok",
             onTap: () async {
-              // TargetPage'e git
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const TargetPage()),
+                MaterialPageRoute(
+                  builder: (_) => TargetPage(studentId: widget.studentId),
+                ),
               );
-              // Geri dönüldüğünde sayıyı güncelle
-              _updatePendingTargets();
+              await _fetchTargets(); // Geri dönüldüğünde hedefleri güncelle
             },
           );
         }
-
-        // Eğer 4. kart (index 3) hedef kartı ise, title ve subtitle'ı özel yap
         if (index == 3) {
           return TopCard(
             index: index,
             title: cards[index]["title"],
             subTitle: cards[index]["subtitle"],
             onTap: () async {
-              // TargetPage'e git
               await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const StudyHoursPage()),
@@ -187,7 +201,6 @@ class _HomePageState extends State<HomePage> {
             },
           );
         }
-
         return TopCard(
           index: index,
           title: cards[index]["title"],
@@ -217,9 +230,8 @@ class _HomePageState extends State<HomePage> {
               fontSize: 16,
               maxLines: null,
               textAlign: TextAlign.center,
-              overflow: TextOverflow.visible, // wrap
+              overflow: TextOverflow.visible,
             ),
-
             const SizedBox(height: 10),
             CustomText(
               text: "- ${sentence[0]["writer"]}",
@@ -289,13 +301,13 @@ class BottomCard extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Constants.lightPrimaryTone, // ikon arka plan rengi
+                    color: Constants.lightPrimaryTone,
                     shape: BoxShape.circle,
                   ),
                   padding: const EdgeInsets.all(10),
                   child: Icon(
                     _getIconForIndex(index),
-                    color: Constants.primaryColor, // ikon rengi
+                    color: Constants.primaryColor,
                     size: 24,
                   ),
                 ),
@@ -303,7 +315,7 @@ class BottomCard extends StatelessWidget {
                 Expanded(
                   child: CustomText(
                     text: title,
-                    color: Colors.black87, // metin rengi
+                    color: Colors.black87,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -351,9 +363,7 @@ class TopCard extends StatelessWidget {
     final bool shouldHighlight =
         index == 2 && int.tryParse(title) != null && int.parse(title) > 0;
 
-    double cardHeight =
-        MediaQuery.of(context).size.height *
-        0.14; // Tüm kartlar için sabit, cihaz boyutuna göre
+    double cardHeight = MediaQuery.of(context).size.height * 0.14;
 
     return SizedBox(
       width: (MediaQuery.of(context).size.width - 48) / 2,
@@ -395,22 +405,9 @@ class TopCard extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                     ),
-                    if (index == 3) ...[
-                      const SizedBox(height: 20),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: 0.5, // ilerleme oranı
-                          backgroundColor: Colors.grey[300],
-                          color: Constants.primaryColor,
-                          minHeight: 6,
-                        ),
-                      ),
-                    ],
+                    
                   ],
                 ),
-
-                // Badge
                 if (shouldHighlight)
                   Positioned(
                     top: 2,
